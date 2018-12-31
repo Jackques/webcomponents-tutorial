@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!-- custom element MUST have at least one dash in the name -->
+<fff-logo>
+    <img src="anva.jpg"/>
+</fff-logo>
+<script>
+
+    // https://developer.mozilla.org/en-US/docs/Web/Web_Components
+
+    /*
+    The <template> tag holds its content hidden from the client.
+    Content inside a <template> tag will not be rendered.
+    The content can be visible and rendered later by using JavaScript.
+
+    Use the <template> tag when you have HTML code you want to use over and over again, but not until you ask for it.
+    To do this without the <template> tag,
+    you have to create the HTML code with JavaScript to prevent the browser from rendering the code.
+    */
+
+    const template = document.createElement('template');
+    template.innerHTML = '<slot><style>:host { display: inline-block }</style><slot/>';
+    // The :host is a new CSS property!
+    // this sets the CSS property on the <fff-logo> tag
+
+    /*
+    The HTML <slot> element—part of the Web Components technology suite—is a placeholder inside a web component
+    that you can fill with your own markup, which lets you create separate DOM trees and present them together.
+
+    You can put <slot>'s in your <template>'s.
+    */
+
+    class ANVALogo extends HTMLElement {
+
+        constructor(){
+            super();
+            // The super keyword is used to access and call functions on an object's parent.
+            // When used in a constructor, the super keyword appears alone and must be used before the this keyword is used.
+            // The super keyword can also be used to call functions on a parent object.
+
+            // I understand that super allows a subclass to have access to the this keyword.
+            console.log('helo from fff-logo');
+
+            this.attachShadow({
+                mode: 'open' // allows us to inspect by console this element
+            })
+        }
+
+        // shadowDOM = data/logic for that specific component
+
+
+        // method below is one of the event handlers of the HTMLelement class,
+        // runs every time you add an element to the page
+
+        connectedCallback(){
+            // Invoked each time the custom element is appended into a document-connected element.
+            // This will happen each time the node is moved, and may happen before the element's contents have been fully parsed.
+            // method native to the HTMLElement class
+
+            this.shadowRoot
+                .appendChild(
+                    template.content.cloneNode(true)
+                )
+            const slot = this.shadowRoot.querySelector('slot');
+            console.log(slot);
+            const img = slot.querySelector('img');
+
+            // easy to influence animating than by using CSS right?
+            this.animate(
+                [
+                    {transform: 'scale(0) rotate(0deg)'},
+                    {transform: 'scale(1) rotate(1080deg)'}
+                ], {
+                    duration: 1000,
+                    easing: 'cubic-bezier(0, 0.6, 0.3, 1)'
+                }
+            );
+            // appends the content of the template to the shadowRoot
+        }
+    };
+    // custom element MUST have at least one dash in the name
+    customElements.define('fff-logo', ANVALogo);
+
+    /* as expected: this is ideal for when you have many different 'components' e.g.:
+    an app built in React and another app built in Angular, which you both want to be present on a page.
+    put/build your app in a web component, use that webcomponent in another app whereever you like.
+    If however everything is built in one framework, just use that one Framework.
+
+    if a new project built for modern browsers, no framework and just using webcomponents (and possibly Polymer)
+    is also a good way to go.
+
+    at the moment of creation, only works in Chrome, polyfills for FF, IE, Edge etc. are available.
+     */
+</script>
+</body>
+</html>
